@@ -7,7 +7,7 @@ Please read through this document before submitting any issues or pull requests 
 information to effectively respond to your bug report or contribution.
 
 
-## Reporting Bugs/Feature Requests
+## Reporting Bugs/Feature Request
 
 We welcome you to use the GitHub issue tracker to report bugs or suggest features.
 
