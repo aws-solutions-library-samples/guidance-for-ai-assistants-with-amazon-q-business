@@ -1,0 +1,169 @@
+openapi: 3.0.0
+info:
+  title: Employee Management API
+  description: API for managing employee leave balances using DynamoDB
+  version: 1.0.0
+servers:
+  - url: Replace Server URL (example : https://x90bvh.execute-api.us-east-1.amazonaws.com/Prod)
+paths:
+  /leaves:
+    get:
+      summary: Retrieve leave balance
+      description: Retrieve the leave balance for the employee with a constant employee ID.
+      operationId: getLeaveBalance
+      responses:
+        "200":
+          description: A JSON object containing the employee's leave balance.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Balance:
+                    type: string
+                    description: The leave balance of the employee.
+                example:
+                  Balance: "10"
+        "404":
+          description: Employee not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Error:
+                    type: string
+                    description: Error message indicating employee not found.
+                example:
+                  Error: Employee not found
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Error:
+                    type: string
+                    description: Detailed error message.
+                example:
+                  Error: Internal server error
+  /apply-leave:
+    post:
+      summary: Apply for leave
+      description: Submit a leave request for the employee with a constant employee ID.
+      operationId: applyForLeave
+      requestBody:
+        description: Details of the leave request.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                from_date:
+                  type: string
+                  format: date
+                  description: The start date of the leave.
+                to_date:
+                  type: string
+                  format: date
+                  description: The end date of the leave.
+                time_off_type:
+                  type: string
+                  description: The type of time off.
+                  enum:
+                    - sick
+                    - vacation
+              required:
+                - from_date
+                - to_date
+                - time_off_type
+              example:
+                from_date: "2024-07-01"
+                to_date: "2024-07-10"
+                time_off_type: "vacation"
+      responses:
+        '200':
+          description: A JSON object indicating success and the updated leave balance.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Message:
+                    type: string
+                    description: Success message with the leave approval details.
+                  new_balance:
+                    type: number
+                    description: The new leave balance after the leave is applied.
+                example:
+                  Message: "Success! Your leave from 2024-07-01 to 2024-07-10 is auto-approved. Your new balance is 5."
+        '400':
+          description: Bad request due to insufficient leave balance or invalid input.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Error:
+                    type: string
+                    description: Error message indicating the reason for failure.
+              examples:
+                InsufficientBalance:
+                  value:
+                    Error: "Insufficient leave balance"
+                InvalidInput:
+                  value:
+                    Error: "Invalid input data"
+        '404':
+          description: Employee not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Error:
+                    type: string
+                    description: Error message indicating employee not found.
+                example:
+                  Error: "Employee not found"
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Error:
+                    type: string
+                    description: Detailed error message.
+                example:
+                  Error: "Internal server error"
+components:
+  schemas:
+    LeaveRequest:
+      type: object
+      properties:
+        from_date:
+          type: string
+          format: date
+          description: The start date of the leave.
+        to_date:
+          type: string
+          format: date
+          description: The end date of the leave.
+        time_off_type:
+          type: string
+          description: The type of time off.
+          enum:
+            - sick
+            - vacation
+      required:
+        - from_date
+        - to_date
+        - time_off_type
+      example:
+        from_date: "2024-07-01"
+        to_date: "2024-07-10"
+        time_off_type: "vacation"
