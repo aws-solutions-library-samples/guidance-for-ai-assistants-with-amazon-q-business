@@ -1,17 +1,8 @@
-# Guidance Title (required)
+# Guidance for Amazon Q Business
 
-The Guidance title should be consistent with the title established first in Alchemy.
+This guidance helps to create a Amazon Q application, connect with data sources and have a chat with a HR application through a custom plugin.
 
-**Example:** *Guidance for Product Substitutions on AWS*
-
-This title correlates exactly to the Guidance it’s linked to, including its corresponding sample code repository. 
-
-
-## Table of Contents (required)
-
-List the top-level sections of the README template, along with a hyperlink to the specific section.
-
-### Required
+## Table of Contents 
 
 1. [Overview](#overview-required)
     - [Cost](#cost)
@@ -32,13 +23,9 @@ List the top-level sections of the README template, along with a hyperlink to th
 
 ## Overview (required)
 
-1. Provide a brief overview explaining the what, why, or how of your Guidance. You can answer any one of the following to help you write this:
+This guidance aims to showcase how to build an end-to-end business application using Amazon Q, a conversational AI assistant, along with AWS services like CloudFormation, DynamoDB, and Lambda. It demonstrates the integration of Amazon Q to retrieve relevant information, pass it to a language model, and return a response. The guidance also uses Infrastructure as Code to manage the application's resources and includes a sample HR time-off request application built using the Amazon Q custom plugin. The key objective is to provide a blueprint for developers to build conversational AI-powered business applications, leveraging the capabilities of Amazon Q and the AWS ecosystem.
 
-    - **Why did you build this Guidance?**
-    - **What problem does this Guidance solve?**
-
-2. Include the architecture diagram image, as well as the steps explaining the high-level overview and flow of the architecture. 
-    - To add a screenshot, create an ‘assets/images’ folder in your repository and upload your screenshot to it. Then, using the relative file path, add it to your README. 
+Architecture Diagram
 
 ### Cost ( required )
 
