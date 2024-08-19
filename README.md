@@ -14,13 +14,6 @@ This guidance helps to create a Amazon Q application, connect with data sources 
 6. [Next Steps](#next-steps)
 7. [Cleanup](#cleanup)
 
-***Optional***
-
-8. [FAQ, known issues, additional considerations, and limitations](#faq-known-issues-additional-considerations-and-limitations-optional)
-9. [Revisions](#revisions-optional)
-10. [Notices](#notices-optional)
-11. [Authors](#authors-optional)
-
 ## Overview
 
 This guidance aims to showcase how to build an end-to-end business application using Amazon Q, a conversational AI assistant, along with AWS services like CloudFormation, DynamoDB, and Lambda. It demonstrates the integration of Amazon Q to retrieve relevant information, pass it to a language model, and return a response. The guidance also uses Infrastructure as Code to manage the application's resources and includes a sample HR time-off request application built using the Amazon Q custom plugin. The key objective is to provide a blueprint for developers to build conversational AI-powered business applications, leveraging the capabilities of Amazon Q and the AWS ecosystem.
