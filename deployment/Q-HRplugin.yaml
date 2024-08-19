@@ -1,0 +1,276 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: API Gateway with Lambda Functions for managing leave balances using DynamoDB
+
+Resources:
+  EmployeeLeavesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: EmployeeLeaves
+      AttributeDefinitions:
+        - AttributeName: EmployeeID
+          AttributeType: S
+      KeySchema:
+        - AttributeName: EmployeeID
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+  EmployeeApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: EmployeeManagementAPI
+
+  LeavesResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref EmployeeApi
+      ParentId: !GetAtt EmployeeApi.RootResourceId
+      PathPart: leaves
+
+  ApplyLeaveResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref EmployeeApi
+      ParentId: !GetAtt EmployeeApi.RootResourceId
+      PathPart: apply-leave
+
+  GetLeavesMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref EmployeeApi
+      ResourceId: !Ref LeavesResource
+      HttpMethod: GET
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetLeavesFunction.Arn}/invocations
+      MethodResponses:
+        - StatusCode: 200
+
+  ApplyLeaveMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref EmployeeApi
+      ResourceId: !Ref ApplyLeaveResource
+      HttpMethod: POST
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApplyLeaveFunction.Arn}/invocations
+      RequestModels:
+        application/json: !Ref ApplyLeaveModel
+      MethodResponses:
+        - StatusCode: 200
+
+  ApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      RestApiId: !Ref EmployeeApi
+      StageName: Prod
+    DependsOn:
+      - GetLeavesMethod
+      - ApplyLeaveMethod
+
+  GetLeavesFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        ZipFile: |
+          import json
+          import boto3
+          def handler(event, context):
+              employee_id = '1'  # Constant employee ID
+              dynamodb = boto3.resource('dynamodb')
+              table = dynamodb.Table('EmployeeLeaves')
+              response = table.get_item(Key={'EmployeeID': employee_id})
+              item = response.get('Item', {})
+              balance = item.get('Balance', 'No record found')
+              return {'statusCode': 200, 'body': json.dumps({'Balance': str(balance)})}
+      Runtime: python3.10
+
+  ApplyLeaveFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        ZipFile: |
+          import json
+          import boto3
+          from decimal import Decimal
+          from datetime import datetime
+          def decimal_default(obj):
+              if isinstance(obj, Decimal):
+                  return float(obj)
+              raise TypeError("Object of type Decimal is not JSON serializable")
+          def calculate_days(from_date, to_date):
+              date_format = "%Y-%m-%d"
+              start_date = datetime.strptime(from_date, date_format)
+              end_date = datetime.strptime(to_date, date_format)
+              delta = end_date - start_date
+              return delta.days + 1
+          def handler(event, context):
+              try:
+                  body = json.loads(event['body'])
+                  from_date = body['from_date']
+                  to_date = body['to_date']
+                  time_off_type = body['time_off_type']
+                  employee_id = '1'  # Constant employee ID
+                  days_requested = calculate_days(from_date, to_date)
+                  dynamodb = boto3.resource('dynamodb')
+                  table = dynamodb.Table('EmployeeLeaves')
+                  # Get current balance
+                  response = table.get_item(Key={'EmployeeID': employee_id})
+                  item = response.get('Item', {})
+                  if not item:
+                      return {
+                          'statusCode': 404,
+                          'body': json.dumps({'Error': 'Employee not found'}, default=decimal_default)
+                      }
+                  current_balance = Decimal(item.get('Balance', '0'))
+                  # Update balance
+                  new_balance = current_balance - Decimal(days_requested)
+                  if new_balance < 0:
+                      return {
+                          'statusCode': 400,
+                          'body': json.dumps({'Error': 'Insufficient leave balance'}, default=decimal_default)
+                      }
+                  # Save leave request and update balance
+                  table.update_item(
+                      Key={'EmployeeID': employee_id},
+                      UpdateExpression="SET Balance = :new_balance, Leaves = list_append(if_not_exists(Leaves, :empty_list), :leave_details)",
+                      ExpressionAttributeValues={
+                          ':new_balance': new_balance,
+                          ':leave_details': [{
+                              'from_date': from_date,
+                              'to_date': to_date,
+                              'time_off_type': time_off_type,
+                              'days_requested': days_requested
+                          }],
+                          ':empty_list': []
+                      }
+                  )
+                  return {
+                      'statusCode': 200,
+                      'body': json.dumps({'Message': f'Success! Your leave from {from_date} to {to_date} is auto-approved. Your new balance is {new_balance}.'}, default=decimal_default)
+                  }
+              except KeyError as e:
+                  return {
+                      'statusCode': 400,
+                      'body': json.dumps({'Error': str(e)}, default=decimal_default)
+                  }
+              except Exception as e:
+                  return {
+                      'statusCode': 500,
+                      'body': json.dumps({'Error': str(e)}, default=decimal_default)
+                  }
+      Runtime: python3.8
+
+  ApiGatewayLambdaInvokePermissionGetLeaves:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt GetLeavesFunction.Arn
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${EmployeeApi}/*/*
+
+  ApiGatewayLambdaInvokePermissionApplyLeave:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt ApplyLeaveFunction.Arn
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${EmployeeApi}/*/*
+
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: LambdaDynamoDBAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:Query
+                  - dynamodb:GetItem
+                  - dynamodb:UpdateItem
+                  - dynamodb:PutItem
+                Resource: !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/EmployeeLeaves
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: '*'
+
+  ApplyLeaveModel:
+    Type: AWS::ApiGateway::Model
+    Properties:
+      RestApiId: !Ref EmployeeApi
+      ContentType: application/json
+      Schema:
+        type: object
+        properties:
+          from_date:
+            type: string
+            format: date
+          to_date:
+            type: string
+            format: date
+          time_off_type:
+            type: string
+
+  PopulateEmployeeLeavesTableFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        ZipFile: |
+          import json
+          import boto3
+          import cfnresponse
+          def handler(event, context):
+              dynamodb = boto3.resource('dynamodb')
+              table = dynamodb.Table('EmployeeLeaves')
+              table.put_item(
+                  Item={
+                      'EmployeeID': '1',
+                      'Balance': 10
+                  }
+              )
+              cfnresponse.send(event, context, cfnresponse.SUCCESS, {})
+              return {
+                  'statusCode': 200,
+                  'body': json.dumps('Successfully populated EmployeeLeaves table')
+              }
+      Runtime: python3.10
+
+  InvokePopulateEmployeeLeavesTableFunction:
+    Type: Custom::InvokeLambda
+    Properties:
+      ServiceToken: !GetAtt PopulateEmployeeLeavesTableFunction.Arn
+
+Outputs:
+  EmployeeApiId:
+    Description: API Gateway ID
+    Value: !Ref EmployeeApi
+    Export:
+      Name: !Sub ${AWS::StackName}-EmployeeApiId
+
+  ApiEndpoint:
+    Description: API Endpoint URL
+    Value: !Sub https://${EmployeeApi}.execute-api.${AWS::Region}.amazonaws.com/Prod
+    Export:
+      Name: ApiEndpoint
