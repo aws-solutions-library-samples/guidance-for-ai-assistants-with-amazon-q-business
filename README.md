@@ -58,7 +58,7 @@ These deployment instructions are optimized to best work on **<MacI>** you can a
 
 ## Deployment Steps
 **Step 01**
-Clone the repository ```git clone <this repo name>
+Clone the repository ```git clone [<this repo name>](https://github.com/aws-solutions-library-samples/guidance-for-amazon-q-business) ```
 
 **Step 02**
 
