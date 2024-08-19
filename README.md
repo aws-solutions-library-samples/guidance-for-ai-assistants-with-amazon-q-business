@@ -43,7 +43,7 @@ In summary, your monthly charges are as follows::
 
 ### Operating System 
 
-These deployment instructions are optimized to best work on **<MacI>** you can also use Cloud9.  
+Any operating system can be used.
 
 ### AWS account requirements
 
