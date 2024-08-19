@@ -35,7 +35,7 @@ This guidance aims to showcase how to build an end-to-end business application u
 
 These deployment instructions are optimized to best work on **<MacI>** you can also use Cloud9.  
 
-### AWS account requirements (If applicable)
+### AWS account requirements
 
 This deployment requires you have a Amazon S3 bucket in your AWS account.
 
@@ -44,71 +44,47 @@ This deployment requires you have a Amazon S3 bucket in your AWS account.
 - Once the folders are created, you can ingest some sample documents into each folder.
 
 
-### Supported Regions (if applicable)
+### Supported Regions 
 
-This guidance applies for all regions where Amazon Q for Business is vaialble. Please check here for availability in you region. https://aws.amazon.com/about-aws/global-infrastructure/regional-product-services/
+This guidance applies for all regions where Amazon Q for Business is vaialble. Please check here for availability in your region. https://aws.amazon.com/about-aws/global-infrastructure/regional-product-services/
 
 
 ## Deployment Steps
+
 **Step 01**
 Clone the repository ```git clone [<this repo name>](https://github.com/aws-solutions-library-samples/guidance-for-amazon-q-business) ```
 
 **Step 02**
 
-- In AWS Cloudformtaion in the console, create a stack and upload the template Q-HRplugin.yaml that can be found under deployment folder. Once deployment is complete 
+- In AWS Cloudformtaion in the console, create a stack and upload the template Q-HRplugin.yaml that can be found under deployment folder. Once deployment is complete, you can get the **ApiEndpoint** from the **Outputs** tab of the stack.
 - Once the deployment is complete for the above stack, create a new stack and upload the template Q-App.yaml that can be found under deployment folder.
-- For the paramters, 
+- For the paramters, enter the **ApiEndpoint**, name of the S3 bucket you had previously created and provide under **S3BucketName** and the arn of the IDC instance in **IdentityCenterInstanceArn**
 
+**Step 03**
+- Create a user in IAM Identity Center. (https://docs.aws.amazon.com/amazonq/latest/qbusiness-ug/idp-sso.html)
 
- 
-**Example:**
+**Step 04**
 
-1. Clone the repo using command ```git clone xxxxxxxxxx```
-2. cd to the repo folder ```cd <repo-name>```
-3. Install packages in requirements using command ```pip install requirement.txt```
-4. Edit content of **file-name** and replace **s3-bucket** with the bucket name in your account.
-5. Run this command to deploy the stack ```cdk deploy``` 
-6. Capture the domain name created by running this CLI command ```aws apigateway ............```
+- For **Sync Mode** choose **Full Sync**
+  
+- ## Deployment Validation  
 
-
-
-## Deployment Validation  
-
-<Provide steps to validate a successful deployment, such as terminal output, verifying that the resource is created, status of the CloudFormation template, etc.>
-
-
-**Examples:**
-
-* Open CloudFormation console and verify the status of the template with the name starting with xxxxxx.
-* If deployment is successful, you should see an active database instance with the name starting with <xxxxx> in        the RDS console.
-*  Run the following CLI command to validate the deployment: ```aws cloudformation describe xxxxxxxxxxxxx```
-
-
+* Open CloudFormation console and verify the status of the 2 template to be **CREATE_COMPLETE**
+* If deployment is successful, you should see an active Amazon Q application in the console.
 
 ## Running the Guidance 
 
-<Provide instructions to run the Guidance with the sample data or input provided, and interpret the output received.> 
-
-This section should include:
-
-* Guidance inputs
-* Commands to run
-* Expected output (provide screenshot if possible)
-* Output description
-
-
+In the newly created Amazon Q appplication, you can now run queries such as 
+- "What is my vacation balance?"
 
 ## Next Steps 
 
-Provide suggestions and recommendations about how customers can modify the parameters and the components of the Guidance to further enhance it according to their requirements.
+You can ingest other documents in S3 or connect to other data sources, to your newly created Amazon Q application.
 
 
 ## Cleanup 
 
-- Include detailed instructions, commands, and console actions to delete the deployed Guidance.
-- If the Guidance requires manual deletion of resources, such as the content of an S3 bucket, please specify.
- *“For any feedback, questions, or suggestions, please use the issues tab under this repo.”*
-
+Delete the two stacks in Cloudformation and make sure that Amazon Q application has been deleted in the console.
 
 ## Notices 
 
