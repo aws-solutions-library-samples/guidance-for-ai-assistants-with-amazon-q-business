@@ -28,32 +28,25 @@ This guidance aims to showcase how to build an end-to-end business application u
 
 
 ## Prerequisites 
+- AWS Account that you have admin access.
+-  An instance of IAM Identity Center and note down the ARN. Enabled an IAM Identity Center instance, provisioned at least one user, and provided each user with a valid email address. (https://docs.aws.amazon.com/amazonq/latest/qbusiness-ug/idp-sso.html)
 
 ### Operating System 
 
-These deployment instructions are optimized to best work on **<MacI>** you can also use Cloud9.  Deployment in another OS may require additional steps.
-
-- Include install commands for packages, if applicable.
-
+These deployment instructions are optimized to best work on **<MacI>** you can also use Cloud9.  
 
 ### AWS account requirements (If applicable)
 
-*List out pre-requisites required on the AWS account if applicable, this includes enabling AWS regions, requiring ACM certificate.*
+This deployment requires you have a Amazon S3 bucket in your AWS account.
 
-**Example:** “This deployment requires you have public ACM certificate available in your AWS account”
-
-**Example resources:**
-- ACM certificate 
-- DNS record
-- S3 bucket
-- VPC
-- IAM role with specific permissions
-- Enabling a Region or service etc.
+**Resources:**
+- S3 bucket with folders names  **HR**, **Finance**, **Legal**, **Marketing**, **Sales**
+- Once the folders are created, you can ingest some sample documents into each folder.
 
 
 ### Supported Regions (if applicable)
 
-<If the Guidance is built for specific AWS Regions, or if the services used in the Guidance do not support all Regions, please specify the Region this Guidance is best suited for>
+This guidance applies for all regions where Amazon Q for Business is vaialble. Please check here for availability in you region. https://aws.amazon.com/about-aws/global-infrastructure/regional-product-services/
 
 
 ## Deployment Steps
@@ -62,11 +55,9 @@ Clone the repository ```git clone [<this repo name>](https://github.com/aws-solu
 
 **Step 02**
 
-cd deployment/publishAssets
-
-chmod +x ./publish_assets.sh
-
-./publish_Amazon_OpenSearch.sh
+- In AWS Cloudformtaion in the console, create a stack and upload the template Q-HRplugin.yaml that can be found under deployment folder. Once deployment is complete 
+- Once the deployment is complete for the above stack, create a new stack and upload the template Q-App.yaml that can be found under deployment folder.
+- For the paramters, 
 
 
  
