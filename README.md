@@ -21,7 +21,17 @@ This guidance aims to showcase how to build an end-to-end business application u
 ![Architecture Diagram](./assets/archdiagram.png)
 
 ### Cost 
-
+You are an enterprise company with 5,000 employees looking to deploy Amazon Q Business. You decide to purchase Amazon Q Business Lite for 4,500 users and Amazon Q Business Pro for 500 users. You have 1 million enterprise documents across sources like SharePoint, Confluence, and ServiceNow that need indexing with an Enterprise Index. Your monthly charges will be as follows:
+Enterprise Index for 1M documents will need 50 index units of 20K capacity each (assuming that the extracted text size of 1M documents is less than 200 MB * 50 units = 10 GB) :
+* $0.264 per hour * 50 units * 24 hours * 30 days = $9,504
+User subscriptions:
+* 4,500 users * $3 per user/month = $13,500 
+* 500 users * $20 per user/month = $10,000
+* Total user subscriptions: $23,500
+In summary, your monthly charges are as follows::
+* Enterprise Index: $9,504
+* User subscriptions: $23,500
+* Total per month: $33,004
 
 
 ### Sample Cost Table 
@@ -67,7 +77,7 @@ Clone the repository ```git clone [<this repo name>](https://github.com/aws-solu
 
 - For **Sync Mode** choose **Full Sync**
   
-- ## Deployment Validation  
+## Deployment Validation  
 
 * Open CloudFormation console and verify the status of the 2 template to be **CREATE_COMPLETE**
 * If deployment is successful, you should see an active Amazon Q application in the console.
