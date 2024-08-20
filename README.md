@@ -62,7 +62,7 @@ This guidance applies for all regions where Amazon Q for Business is vaialble. P
 ## Deployment Steps
 
 **Step 01**
-Clone the repository ```git clone [<this repo name>](https://github.com/aws-solutions-library-samples/guidance-for-amazon-q-business) ```
+Clone the repository ```git clone https://github.com/aws-solutions-library-samples/guidance-for-amazon-q-business ```
 
 **Step 02**
 
