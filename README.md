@@ -39,7 +39,7 @@ In summary, your monthly charges are as follows::
 
 ## Prerequisites 
 - AWS Account that you have admin access.
--  An instance of IAM Identity Center and note down the ARN. Enabled an IAM Identity Center instance, provisioned at least one user, and provided each user with a valid email address. (https://docs.aws.amazon.com/amazonq/latest/qbusiness-ug/idp-sso.html)
+-  An instance of IAM Identity Center and note down the ARN. [(https://docs.aws.amazon.com/amazonq/latest/qbusiness-ug/idp-sso.html)](https://docs.aws.amazon.com/singlesignon/latest/userguide/get-set-up-for-idc.html)
 
 ### Operating System 
 
@@ -71,7 +71,7 @@ Clone the repository ```git clone https://github.com/aws-solutions-library-sampl
 - For the paramters, enter the **ApiEndpoint**, name of the S3 bucket you had previously created and provide under **S3BucketName** and the arn of the IDC instance in **IdentityCenterInstanceArn**
 
 **Step 03**
-- Create a user in IAM Identity Center. (https://docs.aws.amazon.com/amazonq/latest/qbusiness-ug/idp-sso.html)
+- Create a user and subscription. Follow the instructions here. https://docs.aws.amazon.com/amazonq/latest/qbusiness-ug/adding-users-groups.html
 
 **Step 04**
 
