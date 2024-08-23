@@ -1,5 +1,5 @@
-AWSTemplateFormatVersion: '2010-09-09'
-Description: AWS::QBusiness::Application
+AWSTemplateFormatVersion: 2010-09-09
+Description: 'AWS::QBusiness::Application'
 Parameters:
   ApiEndpoint:
     Type: String
@@ -12,16 +12,6 @@ Parameters:
     Type: String
     Description: Environment tag for the QBusiness application
     Default: production
-  S3BucketFolderName:
-    Type: String
-    Description: The folder name in the S3 bucket
-    AllowedValues:
-      - HR
-      - Finance
-      - Legal
-      - Marketing
-      - Sales
-    Default: HR
   S3BucketName:
     Type: String
     Description: The name of the S3 bucket
@@ -29,82 +19,85 @@ Parameters:
   IdentityCenterInstanceArn:
     Type: String
     Description: The ARN of the Identity Center Instance
-
 Resources:
   QBusinessApplication:
-    Type: AWS::QBusiness::Application
+    Type: 'AWS::QBusiness::Application'
     Properties:
       IdentityCenterInstanceArn: !Ref IdentityCenterInstanceArn
       DisplayName: !Ref DisplayName
-
   QBusinessIndex:
-    Type: AWS::QBusiness::Index
+    Type: 'AWS::QBusiness::Index'
     Properties:
       ApplicationId: !Ref QBusinessApplication
       CapacityConfiguration:
         Units: 1
       DisplayName: qindex
       Type: STARTER
-
   MyIAMRole:
-    Type: AWS::IAM::Role
+    Type: 'AWS::IAM::Role'
     Properties:
       AssumeRolePolicyDocument:
-        Version: '2012-10-17'
+        Version: 2012-10-17
         Statement:
           - Sid: AllowsAmazonQToAssumeRoleForServicePrincipal
             Effect: Allow
             Principal:
               Service: qbusiness.amazonaws.com
-            Action: sts:AssumeRole
+            Action: 'sts:AssumeRole'
             Condition:
               StringEquals:
-                aws:SourceAccount: !Ref AWS::AccountId
+                'aws:SourceAccount': !Ref 'AWS::AccountId'
               ArnLike:
-                aws:SourceArn: !Sub arn:aws:qbusiness:${AWS::Region}:${AWS::AccountId}:application/*
+                'aws:SourceArn': !Sub >-
+                  arn:aws:qbusiness:${AWS::Region}:${AWS::AccountId}:application/*
       Policies:
         - PolicyName: MyCustomPolicy
           PolicyDocument:
-            Version: '2012-10-17'
+            Version: 2012-10-17
             Statement:
               - Sid: AllowsAmazonQToGetObjectfromS3
                 Action:
-                  - s3:GetObject
+                  - 's3:GetObject'
                 Resource:
-                  - !Sub arn:aws:s3:::${S3BucketName}/${S3BucketFolderName}/*
+                  - !Sub 'arn:aws:s3:::${S3BucketName}/*'
                 Effect: Allow
                 Condition:
                   StringEquals:
-                    aws:ResourceAccount: !Ref AWS::AccountId
+                    'aws:ResourceAccount': !Ref 'AWS::AccountId'
               - Sid: AllowsAmazonQToListS3Buckets
                 Action:
-                  - s3:ListBucket
+                  - 's3:ListBucket'
                 Resource:
-                  - !Sub arn:aws:s3:::${S3BucketName}
+                  - !Sub 'arn:aws:s3:::${S3BucketName}'
                 Effect: Allow
                 Condition:
                   StringEquals:
-                    aws:ResourceAccount: !Ref AWS::AccountId
+                    'aws:ResourceAccount': !Ref 'AWS::AccountId'
               - Sid: AllowsAmazonQToIngestDocuments
                 Effect: Allow
                 Action:
-                  - qbusiness:BatchPutDocument
-                  - qbusiness:BatchDeleteDocument
+                  - 'qbusiness:BatchPutDocument'
+                  - 'qbusiness:BatchDeleteDocument'
                 Resource:
-                  - !Sub arn:aws:qbusiness:${AWS::Region}:${AWS::AccountId}:application/${QBusinessApplication}
+                  - !Sub >-
+                    arn:aws:qbusiness:${AWS::Region}:${AWS::AccountId}:application/${QBusinessApplication}/index/*
               - Sid: AllowsAmazonQToCallPrincipalMappingAPIs
                 Effect: Allow
                 Action:
-                  - qbusiness:PutGroup
-                  - qbusiness:CreateUser
-                  - qbusiness:DeleteGroup
-                  - qbusiness:UpdateUser
-                  - qbusiness:ListGroups
+                  - 'qbusiness:PutGroup'
+                  - 'qbusiness:CreateUser'
+                  - 'qbusiness:DeleteGroup'
+                  - 'qbusiness:UpdateUser'
+                  - 'qbusiness:ListGroups'
                 Resource:
-                  - !Sub arn:aws:qbusiness:${AWS::Region}:${AWS::AccountId}:application/${QBusinessApplication}
-
+                  - !Sub >-
+                    arn:aws:qbusiness:${AWS::Region}:${AWS::AccountId}:application/${QBusinessApplication}
+                  - !Sub >-
+                    arn:aws:qbusiness:${AWS::Region}:${AWS::AccountId}:application/${QBusinessApplication}/index/*
+                  - !Sub >-
+                    arn:aws:qbusiness:${AWS::Region}:${AWS::AccountId}:application/${QBusinessApplication}/index/*/data-source/*
   QBusinessPlugin:
-    Type: AWS::QBusiness::Plugin
+    Type: 'AWS::QBusiness::Plugin'
     Properties:
       ApplicationId: !Ref QBusinessApplication
       DisplayName: HRTimeOff
@@ -290,15 +283,25 @@ Resources:
       Tags:
         - Key: Environment
           Value: !Ref Environment
-
+  QBusinessRetriever:
+    Type: 'AWS::QBusiness::Retriever'
+    Properties:
+      ApplicationId: !Ref QBusinessApplication
+      Configuration:
+        NativeIndexConfiguration:
+          IndexId: !GetAtt 
+            - QBusinessIndex
+            - IndexId
+      DisplayName: qretriever
+      Type: NATIVE_INDEX
   QBusinessDataSource:
-    Type: AWS::QBusiness::DataSource
+    Type: 'AWS::QBusiness::DataSource'
     Properties:
       ApplicationId: !Ref QBusinessApplication
       Configuration:
         connectionConfiguration:
           repositoryEndpointMetadata:
-            BucketName: !Sub ${S3BucketName}/${S3BucketFolderName}
+            BucketName: !Sub '${S3BucketName}'
         enableIdentityCrawler: false
         syncMode: FORCED_FULL_CRAWL
         additionalProperties:
@@ -317,8 +320,12 @@ Resources:
                 indexFieldType: STRING
       Description: this is a datasource
       DisplayName: Q-DataSource
-      IndexId: !GetAtt QBusinessIndex.IndexId
-      RoleArn: !GetAtt MyIAMRole.Arn
+      IndexId: !GetAtt 
+        - QBusinessIndex
+        - IndexId
+      RoleArn: !GetAtt 
+        - MyIAMRole
+        - Arn
 Outputs:
   ImportedApiEndpoint:
     Description: The imported API Endpoint from StackA
