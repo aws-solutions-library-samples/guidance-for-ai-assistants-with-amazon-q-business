@@ -67,12 +67,12 @@ Clone the repository ```git clone https://github.com/aws-solutions-library-sampl
 
 **Step 02**
 
-- In AWS Cloudformtaion in the console, create a stack and upload the template Q-HRplugin.yaml that can be found under deployment folder. Once deployment is complete, you can get the **ApiEndpoint** from the **Outputs** tab of the stack.
-- Once the deployment is complete for the above stack, create a new stack and upload the template Q-App.yaml that can be found under deployment folder.
-- For the paramters, enter the **ApiEndpoint**, name of the S3 bucket you had previously created and provide under **S3BucketName** and the arn of the IDC instance in **IdentityCenterInstanceArn**
+- In AWS Cloudformtaion in the console, create a stack and upload the template `Q-HRplugin.yaml` that can be found under `deployment` folder. Once deployment is complete, you can get the value of  **ApiEndpoint** from the **Outputs** tab of the stack.
+- Once the deployment is complete for the above stack, create a new stack and upload the template `Q-App.yaml` that can be found under `deployment` folder.
+- For the paramters, enter the **ApiEndpoint**, name of the S3 bucket you had previously created and provide under **S3BucketName** and the ARN of the IDC instance in **IdentityCenterInstanceArn**
 
 **Step 03**
-- Navigate to the newly created Amazon Q business app in the console. Follow the instructions here. Add the user you had created in IAM Identity Center to this application.
+- Navigate to the newly created Amazon Q business app in the console. Follow the instructions here. Add the user you had created in the `IAM Identity Center` to this application.
 - Now "Edit" the application and proceed to the step where you create a new service role for the web experience. This would give you an endpoint for your application.
   
 **Step 04**
