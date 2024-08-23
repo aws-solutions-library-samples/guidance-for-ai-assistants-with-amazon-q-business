@@ -52,7 +52,7 @@ This deployment requires you have a Amazon S3 bucket in your AWS account.
 
 **Resources:**
 - S3 bucket 
-- Once the bucket is created, you can ingest some sample document under the assets folder into the bucket.
+- Once the bucket is created, you can ingest some sample document provided under the assets folder into the bucket.
 
 
 ### Supported Regions 
@@ -72,8 +72,9 @@ Clone the repository ```git clone https://github.com/aws-solutions-library-sampl
 - For the paramters, enter the **ApiEndpoint**, name of the S3 bucket you had previously created and provide under **S3BucketName** and the arn of the IDC instance in **IdentityCenterInstanceArn**
 
 **Step 03**
-- Create a user and subscription. Follow the instructions here. https://docs.aws.amazon.com/amazonq/latest/qbusiness-ug/adding-users-groups.html
-
+- Navigate to the newly created Amazon Q business app in the console. Follow the instructions here. Add the user you had created in IAM Identity Center to this application.
+- Now "Edit" the application and proceed to the step where you create a new service role for the web experience. This would give you an endpoint for your application.
+  
 **Step 04**
 
 - For **Sync Mode** choose **Full Sync**
@@ -87,6 +88,7 @@ Clone the repository ```git clone https://github.com/aws-solutions-library-sampl
 
 In the newly created Amazon Q appplication, you can now run queries such as 
 - "What is my vacation balance?"
+- How can I create a user in Amazon Q?
 
 ## Next Steps 
 
