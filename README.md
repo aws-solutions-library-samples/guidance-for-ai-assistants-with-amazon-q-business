@@ -40,6 +40,7 @@ In summary, your monthly charges are as follows::
 ## Prerequisites 
 - AWS Account that you have admin access.
 -  An instance of IAM Identity Center and note down the ARN. [(https://docs.aws.amazon.com/amazonq/latest/qbusiness-ug/idp-sso.html)](https://docs.aws.amazon.com/singlesignon/latest/userguide/get-set-up-for-idc.html)
+-  Create a user in identity center.
 
 ### Operating System 
 
