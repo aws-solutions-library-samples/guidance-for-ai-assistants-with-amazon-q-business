@@ -50,8 +50,8 @@ Any operating system can be used.
 This deployment requires you have a Amazon S3 bucket in your AWS account.
 
 **Resources:**
-- S3 bucket with folders names  **HR**, **Finance**, **Legal**, **Marketing**, **Sales**
-- Once the folders are created, you can ingest some sample documents into each folder.
+- S3 bucket 
+- Once the bucket is created, you can ingest some sample document under the assets folder into the bucket.
 
 
 ### Supported Regions 
