@@ -1,0 +1,332 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: 'AWS::QBusiness::Application'
+Parameters:
+  ApiEndpoint:
+    Type: String
+    Description: The API endpoint of the HR system
+  DisplayName:
+    Type: String
+    Description: Display name of the QBusiness application
+    Default: MyQBusinessApp
+  Environment:
+    Type: String
+    Description: Environment tag for the QBusiness application
+    Default: production
+  S3BucketName:
+    Type: String
+    Description: The name of the S3 bucket
+    Default: my-bucket
+  IdentityCenterInstanceArn:
+    Type: String
+    Description: The ARN of the Identity Center Instance
+Resources:
+  QBusinessApplication:
+    Type: 'AWS::QBusiness::Application'
+    Properties:
+      IdentityCenterInstanceArn: !Ref IdentityCenterInstanceArn
+      DisplayName: !Ref DisplayName
+  QBusinessIndex:
+    Type: 'AWS::QBusiness::Index'
+    Properties:
+      ApplicationId: !Ref QBusinessApplication
+      CapacityConfiguration:
+        Units: 1
+      DisplayName: qindex
+      Type: STARTER
+  MyIAMRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowsAmazonQToAssumeRoleForServicePrincipal
+            Effect: Allow
+            Principal:
+              Service: qbusiness.amazonaws.com
+            Action: 'sts:AssumeRole'
+            Condition:
+              StringEquals:
+                'aws:SourceAccount': !Ref 'AWS::AccountId'
+              ArnLike:
+                'aws:SourceArn': !Sub >-
+                  arn:aws:qbusiness:${AWS::Region}:${AWS::AccountId}:application/*
+      Policies:
+        - PolicyName: MyCustomPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: AllowsAmazonQToGetObjectfromS3
+                Action:
+                  - 's3:GetObject'
+                Resource:
+                  - !Sub 'arn:aws:s3:::${S3BucketName}/*'
+                Effect: Allow
+                Condition:
+                  StringEquals:
+                    'aws:ResourceAccount': !Ref 'AWS::AccountId'
+              - Sid: AllowsAmazonQToListS3Buckets
+                Action:
+                  - 's3:ListBucket'
+                Resource:
+                  - !Sub 'arn:aws:s3:::${S3BucketName}'
+                Effect: Allow
+                Condition:
+                  StringEquals:
+                    'aws:ResourceAccount': !Ref 'AWS::AccountId'
+              - Sid: AllowsAmazonQToIngestDocuments
+                Effect: Allow
+                Action:
+                  - 'qbusiness:BatchPutDocument'
+                  - 'qbusiness:BatchDeleteDocument'
+                Resource:
+                  - !Sub >-
+                    arn:aws:qbusiness:${AWS::Region}:${AWS::AccountId}:application/${QBusinessApplication}/index/*
+              - Sid: AllowsAmazonQToCallPrincipalMappingAPIs
+                Effect: Allow
+                Action:
+                  - 'qbusiness:PutGroup'
+                  - 'qbusiness:CreateUser'
+                  - 'qbusiness:DeleteGroup'
+                  - 'qbusiness:UpdateUser'
+                  - 'qbusiness:ListGroups'
+                Resource:
+                  - !Sub >-
+                    arn:aws:qbusiness:${AWS::Region}:${AWS::AccountId}:application/${QBusinessApplication}
+                  - !Sub >-
+                    arn:aws:qbusiness:${AWS::Region}:${AWS::AccountId}:application/${QBusinessApplication}/index/*
+                  - !Sub >-
+                    arn:aws:qbusiness:${AWS::Region}:${AWS::AccountId}:application/${QBusinessApplication}/index/*/data-source/*
+  QBusinessPlugin:
+    Type: 'AWS::QBusiness::Plugin'
+    Properties:
+      ApplicationId: !Ref QBusinessApplication
+      DisplayName: HRTimeOff
+      Type: CUSTOM
+      AuthConfiguration:
+        NoAuthConfiguration: {}
+      CustomPluginConfiguration:
+        Description: This plugin is used to get to know vacation balance
+        ApiSchemaType: OPEN_API_V3
+        ApiSchema:
+          Payload: !Sub |
+            openapi: 3.0.0
+            info:
+              title: Employee Management API
+              description: API for managing employee time off
+              version: 1.0.0
+            servers:
+              - url: ${ApiEndpoint}
+            paths:
+              /leaves:
+                get:
+                  summary: Retrieve leave balance
+                  description: Retrieve the leave balance
+                  operationId: getLeaveBalance
+                  responses:
+                    "200":
+                      description: A JSON object containing the employee's leave balance.
+                      content:
+                        application/json:
+                          schema:
+                            type: object
+                            properties:
+                              Balance:
+                                type: string
+                                description: The leave balance of the employee.
+                            example:
+                              Balance: "10"
+                    "404":
+                      description: Employee not found.
+                      content:
+                        application/json:
+                          schema:
+                            type: object
+                            properties:
+                              Error:
+                                type: string
+                                description: Error message indicating employee not found.
+                            example:
+                              Error: Employee not found
+                    "500":
+                      description: Internal server error.
+                      content:
+                        application/json:
+                          schema:
+                            type: object
+                            properties:
+                              Error:
+                                type: string
+                                description: Detailed error message.
+                            example:
+                              Error: Internal server error
+              /apply-leave:
+                post:
+                  summary: Apply for leave
+                  description: Submit a leave request
+                  operationId: applyForLeave
+                  requestBody:
+                    description: Details of the leave request.
+                    required: true
+                    content:
+                      application/json:
+                        schema:
+                          type: object
+                          properties:
+                            from_date:
+                              type: string
+                              format: date
+                              description: The start date of the leave.
+                            to_date:
+                              type: string
+                              format: date
+                              description: The end date of the leave.
+                            time_off_type:
+                              type: string
+                              description: The type of time off.
+                              enum:
+                                - sick
+                                - vacation
+                          required:
+                            - from_date
+                            - to_date
+                            - time_off_type
+                          example:
+                            from_date: 2024-07-01
+                            to_date: 2024-07-10
+                            time_off_type: vacation
+                  responses:
+                    "200":
+                      description: A JSON object indicating success and the updated leave balance.
+                      content:
+                        application/json:
+                          schema:
+                            type: object
+                            properties:
+                              Message:
+                                type: string
+                                description: Success message with the leave approval details.
+                              new_balance:
+                                type: number
+                                description: The new leave balance after the leave is applied.
+                            example:
+                              Message: Success! Your leave from 2024-07-01 to 2024-07-10 is auto-approved.
+                                Your new balance is 5.
+                    "400":
+                      description: Bad request due to insufficient leave balance or invalid input.
+                      content:
+                        application/json:
+                          schema:
+                            type: object
+                            properties:
+                              Error:
+                                type: string
+                                description: Error message indicating the reason for failure.
+                          examples:
+                            InsufficientBalance:
+                              value:
+                                Error: Insufficient leave balance
+                            InvalidInput:
+                              value:
+                                Error: Invalid input data
+                    "404":
+                      description: Employee not found.
+                      content:
+                        application/json:
+                          schema:
+                            type: object
+                            properties:
+                              Error:
+                                type: string
+                                description: Error message indicating employee not found.
+                            example:
+                              Error: Employee not found
+                    "500":
+                      description: Internal server error.
+                      content:
+                        application/json:
+                          schema:
+                            type: object
+                            properties:
+                              Error:
+                                type: string
+                                description: Detailed error message.
+                            example:
+                              Error: Internal server error
+            components:
+              schemas:
+                LeaveRequest:
+                  type: object
+                  properties:
+                    from_date:
+                      type: string
+                      format: date
+                      description: The start date of the leave.
+                    to_date:
+                      type: string
+                      format: date
+                      description: The end date of the leave.
+                    time_off_type:
+                      type: string
+                      description: The type of time off.
+                      enum:
+                        - sick
+                        - vacation
+                  required:
+                    - from_date
+                    - to_date
+                    - time_off_type
+                  example:
+                    from_date: 2024-07-01
+                    to_date: 2024-07-10
+                    time_off_type: vacation
+      State: ENABLED
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+  QBusinessRetriever:
+    Type: 'AWS::QBusiness::Retriever'
+    Properties:
+      ApplicationId: !Ref QBusinessApplication
+      Configuration:
+        NativeIndexConfiguration:
+          IndexId: !GetAtt 
+            - QBusinessIndex
+            - IndexId
+      DisplayName: qretriever
+      Type: NATIVE_INDEX
+  QBusinessDataSource:
+    Type: 'AWS::QBusiness::DataSource'
+    Properties:
+      ApplicationId: !Ref QBusinessApplication
+      Configuration:
+        connectionConfiguration:
+          repositoryEndpointMetadata:
+            BucketName: !Sub '${S3BucketName}'
+        enableIdentityCrawler: false
+        syncMode: FORCED_FULL_CRAWL
+        additionalProperties:
+          inclusionPatterns: []
+          maxFileSizeInMegaBytes: '50'
+          inclusionPrefixes: []
+          includeSupportedFileType: false
+          exclusionPatterns: []
+        type: S3
+        version: 1.0.0
+        repositoryConfigurations:
+          document:
+            fieldMappings:
+              - dataSourceFieldName: s3_document_id
+                indexFieldName: s3_document_id
+                indexFieldType: STRING
+      Description: this is a datasource
+      DisplayName: Q-DataSource
+      IndexId: !GetAtt 
+        - QBusinessIndex
+        - IndexId
+      RoleArn: !GetAtt 
+        - MyIAMRole
+        - Arn
+Outputs:
+  ImportedApiEndpoint:
+    Description: The imported API Endpoint from StackA
+    Value: !ImportValue ApiEndpoint
