@@ -43,7 +43,7 @@ The following table provides a sample cost breakdown for deploying this guidance
 | Amazon Q Business  | For 5000 enterprise users| \$33,004 |
 | AWS Lambda    | Requests | \$46.91 |
 | Amazon API Gateway|Requests| \$5.0 |
-| **Total estimate** |  | **\$33,200.54 ** |
+| **Total estimate** |  | \$33,200.54  |
 
 
 ## Prerequisites 
