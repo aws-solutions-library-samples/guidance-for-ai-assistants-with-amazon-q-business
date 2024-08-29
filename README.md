@@ -8,8 +8,8 @@ This guidance helps to create a Amazon Q application, connect with data sources 
     - [Cost](#cost)
 2. [Prerequisites](#prerequisites)
     - [Operating System](#operating-system)
-3. [Deployment Steps](#deployment)
-4. [Deployment Validation](#deployment)
+3. [Deployment Steps](#deployment-steps)
+4. [Deployment Validation](#deployment-validation)
 5. [Running the Guidance](#running-the-guidance)
 6. [Next Steps](#next-steps)
 7. [Cleanup](#cleanup)
@@ -96,9 +96,15 @@ Clone the repository ```git clone https://github.com/aws-solutions-library-sampl
 ## Running the Guidance 
 
 In the newly created Amazon Q appplication, you can now run queries such as 
-- "What is my vacation balance?"
-- How can I create a user in Amazon Q?
 
+<u>**Query 1**</u>
+- "How can I create a user in Amazon Q?"
+- Note: Since your data source references Amazon Q user guide stored in Amazon S3 that has been indexed, it would have the context on what your question is about and give you the answer.
+
+<u>**Query 2**</u>
+- If you want to test the plugin, select the ellipsis and choose the plugin.
+- Now you can query on vacation balance etc. "What is my vacation balance?"
+  
 ## Next Steps 
 
 You can ingest other documents in S3 or connect to other data sources, to your newly created Amazon Q application.
