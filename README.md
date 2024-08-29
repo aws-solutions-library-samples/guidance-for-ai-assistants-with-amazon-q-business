@@ -21,7 +21,8 @@ This guidance aims to showcase how to build an end-to-end business application u
 ![Architecture Diagram](./assets/archdiagram.png)
 
 ### Cost 
-You are an enterprise company with 5,000 employees looking to deploy Amazon Q Business. You decide to purchase Amazon Q Business Lite for 4,500 users and Amazon Q Business Pro for 500 users. You have 1 million enterprise documents across sources like SharePoint, Confluence, and ServiceNow that need indexing with an Enterprise Index. Your monthly charges will be as follows:
+**Example Breakdown for Amazon Q Business**
+You are an enterprise company with **5,000** employees looking to deploy Amazon Q Business. You decide to purchase Amazon Q Business Lite for 4,500 users and Amazon Q Business Pro for 500 users. You have 1 million enterprise documents across sources like SharePoint, Confluence, and ServiceNow that need indexing with an Enterprise Index. Your monthly charges will be as follows:
 Enterprise Index for 1M documents will need 50 index units of 20K capacity each (assuming that the extracted text size of 1M documents is less than 200 MB * 50 units = 10 GB) :
 * $0.264 per hour * 50 units * 24 hours * 30 days = $9,504
 User subscriptions:
@@ -31,10 +32,18 @@ User subscriptions:
 In summary, your monthly charges are as follows::
 * Enterprise Index: $9,504
 * User subscriptions: $23,500
-* Total per month: $33,004
+* Total per month: $33,004 for 5000 enterprise employees.
 
+We recommend creating a [budget](https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-create.html) through [AWS Cost Explorer](http://aws.amazon.com/aws-cost-management/aws-cost-explorer/) to help manage costs. Prices are subject to change. For full details, refer to the pricing webpage for each AWS service used in this Guidance.
 
-### Sample Cost Table 
+### Estimated monthly cost breakdown
+The following table provides a sample cost breakdown for deploying this guidance  in the `us-east-1` region for one month.  Please note that these cost calculations are based on the default configuration options of the guidance deployment method described below.
+| **AWS service**          | Dimensions | Cost per **month** \[USD\] |
+|--------------------------|------------|------------|
+| Amazon Q Business  | For 5000 enterprise users| \$33,004 |
+| AWS Lambda    | Requests | \$46.91 |
+| Amazon API Gateway|Requests| \$5.0 |
+| **Total estimate** |  | **\$33,200.54 ** |
 
 
 ## Prerequisites 
