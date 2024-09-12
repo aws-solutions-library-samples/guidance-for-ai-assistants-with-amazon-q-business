@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: 'AWS::QBusiness::Application'
+Description: 'SO9525 AWS::QBusiness::Application'
 Parameters:
   ApiEndpoint:
     Type: String
