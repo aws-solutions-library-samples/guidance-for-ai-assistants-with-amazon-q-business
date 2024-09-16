@@ -1,4 +1,4 @@
-# Guidance for Amazon Q Business
+# Guidance for AI assistants with Amazon Q Business
 
 This guidance helps to create a Amazon Q application, connect with data sources and have a chat with a HR application through a custom plugin.
 
