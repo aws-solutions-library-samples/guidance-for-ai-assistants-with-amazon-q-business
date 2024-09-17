@@ -49,6 +49,8 @@ The following table provides a sample cost breakdown for deploying this guidance
 ## Prerequisites 
 - AWS Account that you have admin access.
 -  An instance of IAM Identity Center and note down the ARN. [(https://docs.aws.amazon.com/amazonq/latest/qbusiness-ug/idp-sso.html)](https://docs.aws.amazon.com/singlesignon/latest/userguide/get-set-up-for-idc.html)
+
+![IDC](assets/IDC.png?raw=true "IDC")
 -  Create a user in identity center.
 
 ### Operating System 
@@ -72,13 +74,24 @@ This guidance applies for all regions where Amazon Q for Business is vaialble. P
 ## Deployment Steps
 
 **Step 01**
+
 Clone the repository ```git clone https://github.com/aws-solutions-library-samples/guidance-for-amazon-q-business ```
 
 **Step 02**
 
-- In AWS Cloudformtaion in the console, create a stack and upload the template `Q-HRplugin.yaml` that can be found under `deployment` folder. Once deployment is complete, you can get the value of  **ApiEndpoint** from the **Outputs** tab of the stack.
+
+- In AWS Cloudformtaion in the console, create a stack and upload the template `Q-HRplugin.yaml` that can be found under `deployment` folder.
+
+![Plugin Creation CFN](assets/CreatePluginCFN.png?raw=true "Create Plugin CFN")
+Once deployment is complete, you can get the value of  **ApiEndpoint** from the **Outputs** tab of the stack.
+
+![API Endpoint](assets/APIEndpoint.png?raw=true "API Endpoint")
 - Once the deployment is complete for the above stack, create a new stack and upload the template `Q-App.yaml` that can be found under `deployment` folder.
+
+![Create QApp CFN](assets/CreateQAppCFN.png?raw=true "Create QApp CFN")
 - For the paramters, enter the **ApiEndpoint**, name of the S3 bucket you had previously created and provide under **S3BucketName** and the ARN of the IDC instance in **IdentityCenterInstanceArn**
+
+![Create QApp Parameters CFN](assets/CreateQAppParametersCFN.png?raw=true "Create QApp Parameters CFN")
 
 **Step 03**
 - Navigate to the newly created Amazon Q business app in the console. Follow the instructions here. Add the user you had created in the `IAM Identity Center` to this application.
@@ -88,6 +101,8 @@ Clone the repository ```git clone https://github.com/aws-solutions-library-sampl
 
 - For **Sync Mode** choose **Full Sync**
   
+![sync](assets/sync.png?raw=true "sync")
+
 ## Deployment Validation  
 
 * Open CloudFormation console and verify the status of the 2 template to be **CREATE_COMPLETE**
