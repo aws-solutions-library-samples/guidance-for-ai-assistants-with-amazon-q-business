@@ -95,7 +95,13 @@ Once deployment is complete, you can get the value of  **ApiEndpoint** from the 
 
 **Step 03**
 - Navigate to the newly created Amazon Q business app in the console. Follow the instructions here. Add the user you had created in the `IAM Identity Center` to this application.
+
+![add user](assets/addUser.png?raw=true "Add User")
+
 - Now "Edit" the application and proceed to the step where you create a new service role for the web experience. This would give you an endpoint for your application.
+
+![edit Q](assets/editQ.png?raw=true "Edit Q")
+![web experience](assets/webexperience.png?raw=true "Web Experience")
   
 **Step 04**
 
