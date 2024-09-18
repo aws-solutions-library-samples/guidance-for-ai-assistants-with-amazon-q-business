@@ -80,7 +80,8 @@ Clone the repository ```git clone https://github.com/aws-solutions-library-sampl
 **Step 02**
 
 
-- In AWS Cloudformtaion in the console, create a stack and upload the template `Q-HRplugin.yaml` that can be found under `deployment` folder.
+- In AWS Cloudformtaion in the console, create a stack and upload the template `Q-HRplugin.yaml` that can be found under `deployment/plugins` folder.
+
 
 ![Plugin Creation CFN](assets/CreatePluginCFN.png?raw=true "Create Plugin CFN")
 Once deployment is complete, you can get the value of  **ApiEndpoint** from the **Outputs** tab of the stack.
