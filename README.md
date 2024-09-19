@@ -1,50 +1,32 @@
 # Guidance for AI Assistants with Amazon Q Business
 
-This guidance helps to create a Amazon Q application, connect with data sources and have a chat with a HR application through a custom plugin.
+This guidance helps to create sample Amazon Q application for various usecases covering relevant Q's features. This guidance provides One click deployable cloudformation templates .
+
+* HR (Available)
+* Finance (Coming up)
+* Sales (Coming up)
+* Marketing (Coming up)
+* Legal (Coming up)
+* IT (Coming up)
+etc.
 
 ## Table of Contents 
 
 1. [Overview](#overview)
-    - [Cost](#cost)
 2. [Prerequisites](#prerequisites)
     - [Operating System](#operating-system)
 3. [Deployment Steps](#deployment-steps)
 4. [Deployment Validation](#deployment-validation)
 5. [Running the Guidance](#running-the-guidance)
 6. [Next Steps](#next-steps)
-7. [Cleanup](#cleanup)
+7. [Cost](#cost)
+8. [Cleanup](#cleanup)
 
 ## Overview
 
 This guidance aims to showcase how to build an end-to-end business application using Amazon Q, a conversational AI assistant, along with AWS services like CloudFormation, DynamoDB, and Lambda. It demonstrates the integration of Amazon Q to retrieve relevant information, pass it to a language model, and return a response. The guidance also uses Infrastructure as Code to manage the application's resources and includes a sample HR time-off request application built using the Amazon Q custom plugin. The key objective is to provide a blueprint for developers to build conversational AI-powered business applications, leveraging the capabilities of Amazon Q and the AWS ecosystem.
 
 ![Architecture Diagram](./assets/archdiagram.png)
-
-### Cost 
-**Example Breakdown for Amazon Q Business**
-You are an enterprise company with **5,000** employees looking to deploy Amazon Q Business. You decide to purchase Amazon Q Business Lite for 4,500 users and Amazon Q Business Pro for 500 users. You have 1 million enterprise documents across sources like SharePoint, Confluence, and ServiceNow that need indexing with an Enterprise Index. Your monthly charges will be as follows:
-Enterprise Index for 1M documents will need 50 index units of 20K capacity each (assuming that the extracted text size of 1M documents is less than 200 MB * 50 units = 10 GB) :
-* $0.264 per hour * 50 units * 24 hours * 30 days = $9,504
-User subscriptions:
-* 4,500 users * $3 per user/month = $13,500 
-* 500 users * $20 per user/month = $10,000
-* Total user subscriptions: $23,500
-In summary, your monthly charges are as follows::
-* Enterprise Index: $9,504
-* User subscriptions: $23,500
-* Total per month: $33,004 for 5000 enterprise employees.
-
-We recommend creating a [budget](https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-create.html) through [AWS Cost Explorer](http://aws.amazon.com/aws-cost-management/aws-cost-explorer/) to help manage costs. Prices are subject to change. For full details, refer to the pricing webpage for each AWS service used in this Guidance.
-
-### Estimated monthly cost breakdown
-The following table provides a sample cost breakdown for deploying this guidance  in the `us-east-1` region for one month.  Please note that these cost calculations are based on the default configuration options of the guidance deployment method described below.
-| **AWS service**          | Dimensions | Cost per **month** \[USD\] |
-|--------------------------|------------|------------|
-| Amazon Q Business  | For 5000 enterprise users| \$33,004 |
-| AWS Lambda    | Requests | \$46.91 |
-| Amazon API Gateway|Requests| \$5.0 |
-| **Total estimate** |  | \$33,200.54  |
-
 
 ## Prerequisites 
 - AWS Account that you have admin access.
@@ -130,6 +112,32 @@ In the newly created Amazon Q appplication, you can now run queries such as
 ## Next Steps 
 
 You can ingest other documents in S3 or connect to other data sources, to your newly created Amazon Q application.
+
+
+## Cost 
+**Example Breakdown for Amazon Q Business**
+You are an enterprise company with **5,000** employees looking to deploy Amazon Q Business. You decide to purchase Amazon Q Business Lite for 4,500 users and Amazon Q Business Pro for 500 users. You have 1 million enterprise documents across sources like SharePoint, Confluence, and ServiceNow that need indexing with an Enterprise Index. Your monthly charges will be as follows:
+Enterprise Index for 1M documents will need 50 index units of 20K capacity each (assuming that the extracted text size of 1M documents is less than 200 MB * 50 units = 10 GB) :
+* $0.264 per hour * 50 units * 24 hours * 30 days = $9,504
+User subscriptions:
+* 4,500 users * $3 per user/month = $13,500 
+* 500 users * $20 per user/month = $10,000
+* Total user subscriptions: $23,500
+In summary, your monthly charges are as follows::
+* Enterprise Index: $9,504
+* User subscriptions: $23,500
+* Total per month: $33,004 for 5000 enterprise employees.
+
+We recommend creating a [budget](https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-create.html) through [AWS Cost Explorer](http://aws.amazon.com/aws-cost-management/aws-cost-explorer/) to help manage costs. Prices are subject to change. For full details, refer to the pricing webpage for each AWS service used in this Guidance.
+
+### Estimated monthly cost breakdown
+The following table provides a sample cost breakdown for deploying this guidance  in the `us-east-1` region for one month.  Please note that these cost calculations are based on the default configuration options of the guidance deployment method described below.
+| **AWS service**          | Dimensions | Cost per **month** \[USD\] |
+|--------------------------|------------|------------|
+| Amazon Q Business  | For 5000 enterprise users| \$33,004 |
+| AWS Lambda    | Requests | \$46.91 |
+| Amazon API Gateway|Requests| \$5.0 |
+| **Total estimate** |  | \$33,200.54  |
 
 
 ## Cleanup 
