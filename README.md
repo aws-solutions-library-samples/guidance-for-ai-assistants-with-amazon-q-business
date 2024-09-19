@@ -2,12 +2,12 @@
 
 This guidance helps to create sample Amazon Q application for various usecases covering relevant Q's features. This guidance provides One click deployable cloudformation templates .
 
-* HR (Available)
-* Finance (Coming up)
-* Sales (Coming up)
-* Marketing (Coming up)
-* Legal (Coming up)
-* IT (Coming up)
+* HR Assistants (Available)
+* Finance Assistants(Coming up)
+* Sales Assistants(Coming up)
+* Marketing Assistants(Coming up)
+* Legal Assistants(Coming up)
+* IT Assistants(Coming up)
 etc.
 
 ## Table of Contents 
