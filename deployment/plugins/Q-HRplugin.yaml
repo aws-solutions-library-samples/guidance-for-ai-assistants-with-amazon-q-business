@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: API Gateway with Lambda Functions for managing leave balances using DynamoDB
+Description: 'SO9525 AWS::QBusiness::Application'
 
 Resources:
   EmployeeLeavesTable:
