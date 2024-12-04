@@ -1,0 +1,352 @@
+openapi: 3.0.0
+info:
+  title: SQLLITE API
+  description: API to interact with SQLLITE database via
+    Lambda and API Gateway. This API expects SQL queries created using the
+    schema present in this OpenAPI spec.
+  version: 1.0.0
+servers:
+  - url: [SERVER URL]
+paths:
+  /execute:
+    post:
+      summary: Execute SQL Query
+      description: >
+        Executes a SQL query on the SQLLITE database. This endpoint accepts
+        a SQL query in the request body, executes it against the database, and
+        returns the results. This can be used to perform various database
+        operations such as retrieving data, updating records, or performing
+        complex SQL queries. The SQL queries should be created using the
+        following schema:
+
+
+        **Customers Table:**
+
+        CREATE TABLE IF NOT EXISTS Customers (
+            CustomerID INT AUTO_INCREMENT PRIMARY KEY,
+            FirstName VARCHAR(50),
+            LastName VARCHAR(50),
+            Email VARCHAR(100),
+            Phone VARCHAR(20),
+            Address VARCHAR(255),
+            City VARCHAR(100),
+            State VARCHAR(100),
+            ZipCode VARCHAR(20),
+            Country VARCHAR(100)
+        );
+
+
+        **Products Table:**
+
+        CREATE TABLE IF NOT EXISTS Products (
+            ProductID INT AUTO_INCREMENT PRIMARY KEY,
+            ProductName VARCHAR(100),
+            Category VARCHAR(100),
+            Price DECIMAL(10, 2),
+            SupplierID INT,
+            FOREIGN KEY (SupplierID) REFERENCES Suppliers(SupplierID)
+        );
+
+
+        **Orders Table:**
+
+        CREATE TABLE IF NOT EXISTS Orders (
+            OrderID INT AUTO_INCREMENT PRIMARY KEY,
+            CustomerID INT,
+            OrderDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            ShipDate TIMESTAMP,
+            Status VARCHAR(50),
+            FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID)
+        );
+
+
+        **OrderDetails Table:**
+
+        CREATE TABLE IF NOT EXISTS OrderDetails (
+            OrderDetailID INT AUTO_INCREMENT PRIMARY KEY,
+            OrderID INT,
+            ProductID INT,
+            Quantity INT,
+            UnitPrice DECIMAL(10, 2),
+            Discount DECIMAL(5, 2),
+            FOREIGN KEY (OrderID) REFERENCES Orders(OrderID),
+            FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+        );
+
+
+        **SalesRepresentatives Table:**
+
+        CREATE TABLE IF NOT EXISTS SalesRepresentatives (
+            SalesRepID INT AUTO_INCREMENT PRIMARY KEY,
+            FirstName VARCHAR(50),
+            LastName VARCHAR(50),
+            Email VARCHAR(100),
+            Phone VARCHAR(20),
+            TerritoryID INT,
+            FOREIGN KEY (TerritoryID) REFERENCES SalesTerritories(TerritoryID)
+        );
+
+
+        **Regions Table:**
+
+        CREATE TABLE IF NOT EXISTS Regions (
+            RegionID INT AUTO_INCREMENT PRIMARY KEY,
+            RegionName VARCHAR(100)
+        );
+
+
+        **SalesTerritories Table:**
+
+        CREATE TABLE IF NOT EXISTS SalesTerritories (
+            TerritoryID INT AUTO_INCREMENT PRIMARY KEY,
+            TerritoryName VARCHAR(100),
+            RegionID INT,
+            FOREIGN KEY (RegionID) REFERENCES Regions(RegionID)
+        );
+
+
+        **Shipments Table:**
+
+        CREATE TABLE IF NOT EXISTS Shipments (
+            ShipmentID INT AUTO_INCREMENT PRIMARY KEY,
+            OrderID INT,
+            ShipDate TIMESTAMP,
+            Carrier VARCHAR(100),
+            TrackingNumber VARCHAR(100),
+            FOREIGN KEY (OrderID) REFERENCES Orders(OrderID)
+        );
+
+
+        **Invoices Table:**
+
+        CREATE TABLE IF NOT EXISTS Invoices (
+            InvoiceID INT AUTO_INCREMENT PRIMARY KEY,
+            OrderID INT,
+            InvoiceDate TIMESTAMP,
+            DueDate TIMESTAMP,
+            TotalAmount DECIMAL(10, 2),
+            FOREIGN KEY (OrderID) REFERENCES Orders(OrderID)
+        );
+
+
+        **Payments Table:**
+
+        CREATE TABLE IF NOT EXISTS Payments (
+            PaymentID INT AUTO_INCREMENT PRIMARY KEY,
+            InvoiceID INT,
+            PaymentDate TIMESTAMP,
+            PaymentAmount DECIMAL(10, 2),
+            PaymentMethod VARCHAR(50),
+            FOREIGN KEY (InvoiceID) REFERENCES Invoices(InvoiceID)
+        );
+
+
+        **Returns Table:**
+
+        CREATE TABLE IF NOT EXISTS Returns (
+            ReturnID INT AUTO_INCREMENT PRIMARY KEY,
+            OrderID INT,
+            ReturnDate TIMESTAMP,
+            ProductID INT,
+            Quantity INT,
+            Reason VARCHAR(255),
+            FOREIGN KEY (OrderID) REFERENCES Orders(OrderID),
+            FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+        );
+
+
+        **Discounts Table:**
+
+        CREATE TABLE IF NOT EXISTS Discounts (
+            DiscountID INT AUTO_INCREMENT PRIMARY KEY,
+            DiscountDescription VARCHAR(255),
+            DiscountPercentage DECIMAL(5, 2)
+        );
+
+
+        **Promotions Table:**
+
+        CREATE TABLE IF NOT EXISTS Promotions (
+            PromotionID INT AUTO_INCREMENT PRIMARY KEY,
+            PromotionName VARCHAR(100),
+            StartDate TIMESTAMP,
+            EndDate TIMESTAMP,
+            DiscountID INT,
+            FOREIGN KEY (DiscountID) REFERENCES Discounts(DiscountID)
+        );
+
+
+        **Suppliers Table:**
+
+        CREATE TABLE IF NOT EXISTS Suppliers (
+            SupplierID INT AUTO_INCREMENT PRIMARY KEY,
+            SupplierName VARCHAR(100),
+            ContactName VARCHAR(100),
+            Email VARCHAR(100),
+            Phone VARCHAR(20),
+            Address VARCHAR(255),
+            City VARCHAR(100),
+            State VARCHAR(100),
+            ZipCode VARCHAR(20),
+            Country VARCHAR(100)
+        );
+
+
+        **Inventory Table:**
+
+        CREATE TABLE IF NOT EXISTS Inventory (
+            InventoryID INT AUTO_INCREMENT PRIMARY KEY,
+            ProductID INT,
+            QuantityInStock INT,
+            ReorderLevel INT,
+            ReorderQuantity INT,
+            FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+        );
+      operationId: executeSqlQuery
+      requestBody:
+        description: JSON object containing the SQL query to execute.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+                  description: >
+                    The SQL query to be executed on the SQLLITE database.
+
+
+                    Examples:
+
+                    - List all customers in California: SELECT * FROM Customers
+                    WHERE State = 'CA';
+
+                    - Total sales for each product in the last quarter: SELECT
+                    p.ProductName, SUM(od.Quantity * od.UnitPrice) AS TotalSales
+                    FROM OrderDetails od JOIN Products p ON od.ProductID =
+                    p.ProductID JOIN Orders o ON od.OrderID = o.OrderID WHERE
+                    o.OrderDate BETWEEN '2024-01-01' AND '2024-03-31' GROUP BY
+                    p.ProductName;
+
+                    - Sales representative with the highest total sales this
+                    year: SELECT sr.FirstName, sr.LastName, SUM(od.Quantity *
+                    od.UnitPrice) AS TotalSales FROM SalesRepresentatives sr
+                    JOIN Orders o ON sr.SalesRepID = o.SalesRepID JOIN
+                    OrderDetails od ON o.OrderID = od.OrderID WHERE o.OrderDate
+                    BETWEEN '2024-01-01' AND '2024-12-31' GROUP BY sr.FirstName,
+                    sr.LastName ORDER BY TotalSales DESC LIMIT 1;
+
+                    - Find all orders that have not been shipped yet: SELECT *
+                    FROM Orders WHERE Status = 'Pending';
+
+                    - Get tracking information for order ID 12345: SELECT
+                    s.Carrier, s.TrackingNumber FROM Shipments s JOIN Orders o
+                    ON s.OrderID = o.OrderID WHERE o.OrderID = 12345;
+
+                    - How many invoices are overdue?: SELECT COUNT(*) AS
+                    OverdueInvoices FROM Invoices WHERE DueDate < CURRENT_DATE
+                    AND InvoiceID NOT IN (SELECT InvoiceID FROM Payments);
+
+                    - What is the most common reason for product returns?:
+                    SELECT Reason, COUNT(*) AS ReturnCount FROM Returns GROUP BY
+                    Reason ORDER BY ReturnCount DESC LIMIT 1;
+
+                    - Which discount has been applied the most?: SELECT
+                    d.DiscountDescription, COUNT(od.Discount) AS DiscountCount
+                    FROM Discounts d JOIN OrderDetails od ON d.DiscountID =
+                    od.Discount GROUP BY d.DiscountDescription ORDER BY
+                    DiscountCount DESC LIMIT 1;
+
+                    - Which promotion resulted in the highest increase in
+                    sales?: SELECT p.PromotionName, SUM(od.Quantity *
+                    od.UnitPrice) AS PromotionSales FROM Promotions p JOIN
+                    OrderDetails od ON p.DiscountID = od.Discount JOIN Orders o
+                    ON od.OrderID = o.OrderID WHERE o.OrderDate BETWEEN
+                    p.StartDate AND p.EndDate GROUP BY p.PromotionName ORDER BY
+                    PromotionSales DESC LIMIT 1;
+
+                    - List all suppliers located in the United States: SELECT *
+                    FROM Suppliers WHERE Country = 'United States';
+
+                    - Which products are below their reorder level?: SELECT
+                    p.ProductName, i.QuantityInStock, i.ReorderLevel FROM
+                    Inventory i JOIN Products p ON i.ProductID = p.ProductID
+                    WHERE i.QuantityInStock < i.ReorderLevel;
+
+                    - What are the total sales by region for the past year?:
+                    SELECT r.RegionName, SUM(od.Quantity * od.UnitPrice) AS
+                    TotalSales FROM Regions r JOIN SalesTerritories st ON
+                    r.RegionID = st.RegionID JOIN SalesRepresentatives sr ON
+                    st.TerritoryID = sr.TerritoryID JOIN Orders o ON
+                    sr.SalesRepID = o.SalesRepID JOIN OrderDetails od ON
+                    o.OrderID = od.OrderID WHERE o.OrderDate BETWEEN
+                    '2023-01-01' AND '2023-12-31' GROUP BY r.RegionName;
+
+                    - Who are the top 10 customers by total purchases?: SELECT
+                    c.FirstName, c.LastName, SUM(od.Quantity * od.UnitPrice) AS
+                    TotalPurchases FROM Customers c JOIN Orders o ON
+                    c.CustomerID = o.CustomerID JOIN OrderDetails od ON
+                    o.OrderID = od.OrderID GROUP BY c.FirstName, c.LastName
+                    ORDER BY TotalPurchases DESC LIMIT 10;
+
+                    - Which products have the highest sales volume?: SELECT
+                    p.ProductName, SUM(od.Quantity) AS TotalQuantitySold FROM
+                    Products p JOIN OrderDetails od ON p.ProductID =
+                    od.ProductID GROUP BY p.ProductName ORDER BY
+                    TotalQuantitySold DESC LIMIT 5;
+
+                    - Analyze feedback for the most frequently returned product:
+                    SELECT r.Reason, COUNT(*) AS FeedbackCount FROM Returns r
+                    WHERE r.ProductID = (SELECT ProductID FROM Returns GROUP BY
+                    ProductID ORDER BY COUNT(*) DESC LIMIT 1) GROUP BY r.Reason
+                    ORDER BY FeedbackCount DESC;
+      responses:
+        "200":
+          description: Successful execution of the SQL query. The response contains the
+            results of the query.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  response_data:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+              example:
+                response_data:
+                  - CustomerID: 1
+                    FirstName: John
+                    LastName: Doe
+                    Email: john.doe@example.com
+                    Phone: 123-456-7890
+                    Address: 123 Main St
+                    City: Anytown
+                    State: CA
+                    ZipCode: "12345"
+                    Country: USA
+                  - OrderID: 101
+                    OrderDate: 2024-05-01
+                    CustomerID: 1
+                    Status: Shipped
+                  - ProductID: 1001
+                    ProductName: Widget
+                    Category: Gadgets
+                    Price: 19.99
+        "500":
+          description: Error executing the SQL query
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Error executing query: [error message]"
+                  status_code:
+                    type: integer
+                    example: 500
+              example:
+                error: "Error executing query: Database connection failed"
