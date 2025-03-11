@@ -98,6 +98,7 @@ Resources:
                     arn:aws:qbusiness:${AWS::Region}:${AWS::AccountId}:application/${QBusinessApplication}/index/*/data-source/*
   QBusinessPlugin:
     Type: 'AWS::QBusiness::Plugin'
+    DependsOn: QBusinessApplication
     Properties:
       ApplicationId: !Ref QBusinessApplication
       DisplayName: HRTimeOff
