@@ -89,6 +89,8 @@ Resources:
                   - 'qbusiness:DeleteGroup'
                   - 'qbusiness:UpdateUser'
                   - 'qbusiness:ListGroups'
+                  - 'qbusiness:BatchPutDocument'
+                  - 'qbusiness:BatchDeleteDocument'
                 Resource:
                   - !Sub >-
                     arn:aws:qbusiness:${AWS::Region}:${AWS::AccountId}:application/${QBusinessApplication}
